@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "nodemon",
-    "build": "tsc"
+    "start": "node dist/server.js",
+    "create:db": "node dist/init/createDatabase.js",
+    "build": "tsc",
+    "dev": "nodemon src/server.ts",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d ./src/config/db.ts",
+    "migration:create": "typeorm-ts-node-commonjs migration:create ./src/migrations/$npm_config_name",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d ./src/config/db.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ./src/config/db.ts"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +19,9 @@
   "description": "",
   "devDependencies": {
     "@types/amqplib": "^0.10.6",
+    "@types/express": "^5.0.0",
     "@types/node": "^22.10.1",
+    "@types/pg": "^8.11.10",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",
     "eslint": "^9.16.0",
@@ -26,6 +34,10 @@
   },
   "dependencies": {
     "amqplib": "^0.10.5",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20"
   }
 }
