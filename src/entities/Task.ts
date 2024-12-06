@@ -12,7 +12,7 @@ export class Task {
   description?: string;
 
   @Column({ default: "pending" })
-  status!: string;
+  status?: string;
 
   @CreateDateColumn()
   created_at?: Date;
