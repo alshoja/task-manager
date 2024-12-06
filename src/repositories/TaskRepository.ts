@@ -1,3 +1,4 @@
+import { CreateTaskDTO } from "./../dto/CreateTaskDTO";
 import { Repository } from "typeorm";
 import { Task } from "../entities/Task";
 import { AppDataSource } from "../config/db";
@@ -9,9 +10,9 @@ export class TaskRepository {
     this.repository = AppDataSource.getRepository(Task);
   }
 
-  async createTask(title: string, description?: string): Promise<Task> {
-    const task = this.repository.create({ title, description });
-    return await this.repository.save(task);
+  async createTask(task: CreateTaskDTO): Promise<Task> {
+    const _task = this.repository.create(task);
+    return await this.repository.save(_task);
   }
 
   async findAllTasks(): Promise<Task[]> {

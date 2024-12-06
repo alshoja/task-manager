@@ -1,15 +1,16 @@
 import { TaskRepository } from '../repositories/TaskRepository';
 import { Task } from '../entities/Task';
+import { CreateTaskDTO } from '../dto/CreateTaskDTO';
 
 export class TaskService {
   private taskRepository: TaskRepository
-  
+
   constructor() {
     this.taskRepository = new TaskRepository();
   }
 
-  async createTask(title: string, description?: string): Promise<Task> {
-    return this.taskRepository.createTask(title, description);
+  async createTask(task: CreateTaskDTO): Promise<Task> {
+    return this.taskRepository.createTask(task);
   }
 
   async getAllTasks(): Promise<Task[]> {
