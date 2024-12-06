@@ -7,9 +7,8 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// app.use("/", (_req, res) => {
-//   res.json({ server: "Started",time: new Date() });
-// });
-
 app.use("/api", taskRoutes);
+app.use("/", (_req, res) => {
+  res.json({ server: "Started",time: new Date() });
+});
 export default app;
