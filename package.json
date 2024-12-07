@@ -1,17 +1,17 @@
 {
   "name": "task-manager",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node dist/server.js",
     "create:db": "node dist/init/createDatabase.js",
     "build": "tsc",
     "dev": "nodemon src/server.ts",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d ./src/config/db.ts",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d ./src/config/Db.config.ts",
     "migration:create": "typeorm-ts-node-commonjs migration:create ./src/migrations/$npm_config_name",
-    "migration:run": "typeorm-ts-node-commonjs migration:run -d ./src/config/db.ts",
-    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ./src/config/db.ts"
+    "migrate": "typeorm-ts-node-commonjs migration:run -d ./src/config/Db.config.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ./src/config/Db.config.ts"
   },
   "keywords": [],
   "author": "",
