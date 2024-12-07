@@ -1,6 +1,6 @@
-import { TaskRepository } from '../repositories/TaskRepository';
-import { Task } from '../entities/Task';
-import { CreateTaskDTO } from '../dto/CreateTaskDTO';
+import { TaskRepository } from '../repositories/Task.repository';
+import { Task } from '../entities/Task.entity';
+import { CreateTaskDTO } from '../dto/Task.dto';
 
 export class TaskService {
   private taskRepository: TaskRepository

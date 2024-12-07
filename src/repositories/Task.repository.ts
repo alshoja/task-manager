@@ -1,7 +1,7 @@
-import { CreateTaskDTO } from "./../dto/CreateTaskDTO";
+import { CreateTaskDTO } from "../dto/Task.dto";
 import { Repository } from "typeorm";
-import { Task } from "../entities/Task";
-import { AppDataSource } from "../config/db";
+import { Task } from "../entities/Task.entity";
+import { AppDataSource } from "../config/Db.config";
 
 export class TaskRepository {
   private repository: Repository<Task>;
