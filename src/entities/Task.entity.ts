@@ -1,6 +1,5 @@
-import { IsEnum, IsOptional, IsString, Length } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { TaskStatus } from "../dto/Task.dto";
+import { TaskStatus } from "../utils/Task.enum";
 
 
 @Entity("tasks")
@@ -14,7 +13,10 @@ export class Task {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ default: "pending" })
+  @Column({
+    enum: TaskStatus,
+    default: TaskStatus.OPEN,
+  })
   status?: string;
 
   @CreateDateColumn()

@@ -9,10 +9,10 @@ const app = express();
 app.use(express.json());
 
 app.use("/api", taskRoutes);
-
 app.all('*', (req, res, next) => {
   const err = new AppError(`Can't find ${req.originalUrl} on the server!`, 404);
   next(err);
 });
+
 app.use(globalErrorMiddleware);
 export default app;

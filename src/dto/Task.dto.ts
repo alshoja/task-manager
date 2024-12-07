@@ -1,10 +1,5 @@
 import { IsString, Length, IsOptional, IsEnum } from "class-validator";
-
-export enum TaskStatus {
-  OPEN = "OPEN",
-  IN_PROGRESS = "IN_PROGRESS",
-  DONE = "DONE",
-}
+import { TaskStatus } from "../utils/Task.enum";
 
 export class CreateTaskDTO {
   @IsString()
@@ -30,6 +25,7 @@ export class UpdateTaskDTO {
   @Length(10, 200, { message: "Description must be between 10 and 200 characters if provided." })
   description?: string;
 
+  @IsOptional()
   @IsEnum(TaskStatus, { message: "Status must be one of: OPEN, IN_PROGRESS, DONE." })
   status?: string;
 }
