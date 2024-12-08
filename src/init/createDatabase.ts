@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import dotenv from "dotenv";
-import { EnvConfig } from "../models/env.model";
+import { EnvConfig } from "../interfaces/env.interface";
 
 dotenv.config();
 
