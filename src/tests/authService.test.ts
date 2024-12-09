@@ -8,8 +8,9 @@ import { AppDataSource } from '../config/Db.config';
 jest.mock('../repositories/User.repository');
 jest.mock('jsonwebtoken');
 
-const mockUserRepository = UserRepository as jest.MockedClass<typeof UserRepository>;
+let mockUserRepository = UserRepository as jest.MockedClass<typeof UserRepository>;
 const mockJwt = jwt as jest.Mocked<typeof jwt>;
+
 
 jest.mock('../config/Db.config.ts', () => ({
     AppDataSource: {
@@ -34,7 +35,8 @@ describe('AuthService', () => {
     });
 
     beforeEach(() => {
-        authService = new AuthService();
+        const userRepository = new mockUserRepository()
+        authService = new AuthService(userRepository);
         mockUserRepository.prototype.findUserByEmail.mockClear();
         mockUserRepository.prototype.create.mockClear();
         mockJwt.sign.mockClear();

@@ -4,6 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "start": "node dist/server.js",
     "create:db": "node dist/init/createDatabase.js",
