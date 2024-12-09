@@ -6,8 +6,8 @@ import { AppError } from '../middlewares/GlobalErrorHandler.middleware';
 export class TaskService {
   private taskRepository: TaskRepository
 
-  constructor() {
-    this.taskRepository = new TaskRepository();
+  constructor(taskRepository: TaskRepository) {
+    this.taskRepository = taskRepository
   }
 
   async createTask(task: CreateTaskDTO): Promise<Task> {

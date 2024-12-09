@@ -1,22 +1,27 @@
+import { TagService } from './../services/Tag.service';
 import { NextFunction, Request, Response } from "express";
-import { TagService } from "../services/Tag.service";
 
-const tagService = new TagService();
 
 export class TagController {
-  static async createTag(req: Request, res: Response, next: NextFunction): Promise<void> {
+  private tagService: TagService
+
+  constructor(tagService: TagService) {
+    this.tagService = tagService
+  }
+
+  async createTag(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { name } = req.body;
-      const tag = await tagService.createTag({ name });
+      const tag = await this.tagService.createTag({ name });
       res.status(201).json(tag);
     } catch (error: any) {
       next(error);
     }
   }
 
-  static async getAllTags(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getAllTags(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const tags = await tagService.getAllTags();
+      const tags = await this.tagService.getAllTags();
       res.status(200).json(tags);
     } catch (error: any) {
       next(error);

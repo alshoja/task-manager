@@ -8,8 +8,8 @@ import { AppError } from '../middlewares/GlobalErrorHandler.middleware';
 export class AuthService {
   private userRepository: UserRepository
 
-  constructor() {
-    this.userRepository = new UserRepository();
+  constructor(userRepository: UserRepository) {
+    this.userRepository = userRepository
   }
 
   async register(user: CreateUserDTO): Promise<User> {
