@@ -34,7 +34,6 @@ export class App {
     try {
       await redis.connect();
       await rabbitMQ.connect();
-
     } catch (error) {
       console.error("Error initializing external services:", error);
     }
