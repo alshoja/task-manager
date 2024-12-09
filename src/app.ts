@@ -1,18 +1,33 @@
 import dotenv from "dotenv";
-import express from "express";
+import express, { Application } from "express";
 import { AppError, globalErrorMiddleware } from "./middlewares/GlobalErrorHandler.middleware";
 import Routes from "./routes/Index";
 
 dotenv.config();
+export class App {
+  public app: Application;
 
-const app = express();
-app.use(express.json());
+  constructor() {
+    this.app = express();
+    this.initializeMiddlewares();
+    this.initializeRoutes();
+    this.initializeErrorHandling();
+  }
 
-app.use("/", Routes);
-app.all('*', (req, res, next) => {
-  const err = new AppError(`Can't find ${req.originalUrl} on the server!`, 404);
-  next(err);
-});
+  private initializeMiddlewares(): void {
+    this.app.use(express.json());
+  }
 
-app.use(globalErrorMiddleware);
-export default app;
+  private initializeRoutes(): void {
+    this.app.use("/", Routes);
+    this.app.all('*', (req, res, next) => next(new AppError(`Can't find ${req.originalUrl} on the server!`, 404)));
+  }
+
+  private initializeErrorHandling(): void {
+    this.app.use(globalErrorMiddleware);
+  }
+
+  public getApp(): Application {
+    return this.app;
+  }
+}
