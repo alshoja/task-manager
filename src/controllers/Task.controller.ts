@@ -12,7 +12,7 @@ export class TaskController {
       const task = await taskService.createTask({ title, description, status });
       res.status(201).json(task);
     } catch (error) {
-      next(new AppError('Failed to create task', 500));
+      next(error);
     }
   }
 
@@ -21,8 +21,7 @@ export class TaskController {
       const tasks = await taskService.getAllTasks();
       res.status(200).json(tasks);
     } catch (error) {
-      console.log("🚀 ~ TaskController ~ getAllTasks ~ error:", error)
-      next(new AppError('Failed to fetch tasks', 500));
+      next(error);
     }
   }
 
@@ -30,10 +29,9 @@ export class TaskController {
     const { id } = req.params;
     try {
       const task = await taskService.getTaskById(Number(id));
-      if (!task) throw new AppError("Task not found", 404)
       res.status(200).json(task);
     } catch (error) {
-      next(new AppError('Failed to fetch tasks', 500));
+      next(error);
     }
   }
 
@@ -41,15 +39,10 @@ export class TaskController {
     const { id } = req.params;
     const { title, description } = req.body;
     try {
-      const updatedTask = await taskService.updateTask(
-        Number(id),
-        title,
-        description
-      );
-      if (!updatedTask) throw new AppError("Task not found", 404)
+      const updatedTask = await taskService.updateTask(Number(id), title, description);
       res.status(200).json(updatedTask);
     } catch (error) {
-      next(new AppError('Failed to update task', 500));
+      next(error);
     }
   }
 
@@ -59,7 +52,7 @@ export class TaskController {
       const task = await taskService.deleteTask(Number(id));
       res.status(204).json(task);
     } catch (error) {
-      next(new AppError('Failed to delete tasks', 500));
+      next(error);
     }
   }
 }
