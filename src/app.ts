@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 import express, { Application } from "express";
 import { AppError, globalErrorMiddleware } from "./middlewares/GlobalErrorHandler.middleware";
 import Routes from "./routes/Index";
+import { redis } from "./config/Redis.config";
+import { rabbitMQ } from "./config/Rabbitmq.config";
 
 dotenv.config();
 export class App {
@@ -12,6 +14,7 @@ export class App {
     this.initializeMiddlewares();
     this.initializeRoutes();
     this.initializeErrorHandling();
+    this.initializeExternalServices();
   }
 
   private initializeMiddlewares(): void {
@@ -25,6 +28,16 @@ export class App {
 
   private initializeErrorHandling(): void {
     this.app.use(globalErrorMiddleware);
+  }
+
+  private async initializeExternalServices(): Promise<void> {
+    try {
+      await redis.connect();
+      await rabbitMQ.connect();
+
+    } catch (error) {
+      console.error("Error initializing external services:", error);
+    }
   }
 
   public getApp(): Application {
