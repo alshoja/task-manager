@@ -1,8 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 import { AppError } from "./GlobalErrorHandler.middleware";
 import { AuthService } from "../services/Auth.service ";
-
-
 export class AuthMiddleware {
     static async verifyJwt(
         req: Request,
