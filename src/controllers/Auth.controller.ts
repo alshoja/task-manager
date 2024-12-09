@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthService } from "../services/Auth.service ";
 
-// const authService = new AuthService();
-
 export class AuthController {
     private authService: AuthService;
 

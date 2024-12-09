@@ -12,23 +12,23 @@ let mockUserRepository = UserRepository as jest.MockedClass<typeof UserRepositor
 const mockJwt = jwt as jest.Mocked<typeof jwt>;
 
 
-jest.mock('../config/Db.config.ts', () => ({
-    AppDataSource: {
-      initialize: jest.fn(),
-      destroy: jest.fn(),
-      isInitialized: true,
-      getRepository: jest.fn().mockReturnValue({
-        findOne: jest.fn(),
-        save: jest.fn(),
-      }),
-    },
-  }));
-
 describe('AuthService', () => {
     let authService: AuthService;
 
+    jest.mock('../config/Db.config.ts', () => ({
+        AppDataSource: {
+            initialize: jest.fn(),
+            destroy: jest.fn(),
+            isInitialized: true,
+            getRepository: jest.fn().mockReturnValue({
+                findOne: jest.fn(),
+                save: jest.fn(),
+            }),
+        },
+    }));
+
     afterAll(async () => {
-        jest.spyOn(console, 'log').mockImplementation(() => {});
+        jest.spyOn(console, 'log').mockImplementation(() => { });
         if (AppDataSource.isInitialized) {
             await AppDataSource.destroy();
         }
