@@ -4,7 +4,6 @@ import { EnvConfig } from "../interfaces/env.interface";
 
 dotenv.config();
 
-
 const getEnvConfig = (): EnvConfig => {
   const config = process.env as unknown as EnvConfig;
   if (!config.DB_USER || !config.DB_PASSWORD || !config.DB_HOST || !config.DB_PORT || !config.DB_NAME) {
