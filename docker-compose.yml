@@ -23,6 +23,7 @@ services:
   task-service:
     build: ./task-service
     container_name: task_service
+    restart: unless-stopped
     environment:
       - RABBITMQ_URL=amqp://rabbit_mq:5672
       - REDIS_URL=redis://redis:6379
@@ -40,6 +41,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:management
+    restart: unless-stopped
     container_name: rabbit_mq
     ports:
       - "5672:5672"
@@ -47,12 +49,14 @@ services:
 
   redis:
     image: redis:latest
+    restart: unless-stopped
     container_name: redis
     ports:
       - "6379:6379"
 
   db:
     container_name: task_manager_db
+    restart: unless-stopped
     image: postgres
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -65,8 +69,6 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
-    restart: unless-stopped
-
 volumes:
   db:
 
