@@ -6,6 +6,7 @@ services:
     container_name: notification_service
     restart: unless-stopped
     environment:
+      - NODE_ENV=production  # Set to production
       - RABBITMQ_URL=amqp://rabbit_mq:5672
       - REDIS_URL=redis://redis:6379
       - DB_HOST=task_manager_db
@@ -25,6 +26,7 @@ services:
     container_name: task_service
     restart: unless-stopped
     environment:
+      - NODE_ENV=production  # Set to production
       - RABBITMQ_URL=amqp://rabbit_mq:5672
       - REDIS_URL=redis://redis:6379
       - DB_HOST=task_manager_db
