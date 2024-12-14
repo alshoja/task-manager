@@ -1,0 +1,92 @@
+version: "3.8"
+
+services:
+  notification-service:
+    build:
+      context: ./notification-service
+    container_name: notification_service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - RABBITMQ_URL=amqp://rabbit_mq:5672
+      - REDIS_URL=redis://redis:6379
+      - DB_HOST=task_manager_db
+      - DB_USER=root
+      - DB_PASSWORD=alshoja
+      - DB_NAME=notification_service
+    depends_on:
+      - rabbitmq
+      - redis
+      - db
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./notification-service:/app # Mount code for live reload
+      - /app/node_modules
+      - /app/dist
+    command:
+      ["sh", "-c", "npm install && npm run migrate && npm run dev:docker"]
+
+  task-service:
+    build:
+      context: ./task-service
+    container_name: task_service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - RABBITMQ_URL=amqp://rabbit_mq:5672
+      - REDIS_URL=redis://redis:6379
+      - DB_HOST=task_manager_db
+      - DB_USER=root
+      - DB_PASSWORD=alshoja
+      - DB_NAME=task_service
+    depends_on:
+      - rabbitmq
+      - redis
+      - db
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./task-service:/app # Mount code for live reload
+      - /app/node_modules # Prevent overwriting node_modules
+      - /app/dist
+
+    command:
+      ["sh", "-c", "npm install && npm run migrate && npm run dev:docker"]
+
+  rabbitmq:
+    image: rabbitmq:management
+    restart: unless-stopped
+    container_name: rabbit_mq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  db:
+    container_name: task_manager_db
+    restart: unless-stopped
+    image: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: alshoja
+      PGDATA: /data/postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db:/data/postgres
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+volumes:
+  db:
+
+networks:
+  common-net: {}

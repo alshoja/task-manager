@@ -10,6 +10,7 @@
     "create:db": "node dist/init/createDatabase.js",
     "build": "tsc",
     "dev": "nodemon src/server.ts",
+    "dev:docker": "npx nodemon --watch src --ext ts --exec 'npm run build && node dist/server.js'",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -d ./src/config/Db.config.ts",
     "migration:create": "typeorm-ts-node-commonjs migration:create ./src/migrations/$npm_config_name",
