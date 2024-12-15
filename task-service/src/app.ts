@@ -4,6 +4,8 @@ import { AppError, globalErrorMiddleware } from "./middlewares/GlobalErrorHandle
 import Routes from "./routes/Index";
 import { redis } from "./config/Redis.config";
 import { rabbitMQ } from "./config/Rabbitmq.config";
+import authRoutes from "./routes/Auth.route";
+
 
 dotenv.config();
 export class App {
@@ -22,6 +24,7 @@ export class App {
   }
 
   private initializeRoutes(): void {
+    this.app.use("/api", authRoutes);
     this.app.use("/", Routes);
     this.app.all('*', (req, res, next) => next(new AppError(`Can't find ${req.originalUrl} on the server!`, 404)));
   }

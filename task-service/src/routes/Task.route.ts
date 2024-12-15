@@ -4,9 +4,13 @@ import { validateDto } from '../middlewares/Validation.middleware';
 import { CreateTaskDTO, UpdateTaskDTO } from '../dto/Task.dto';
 import { TaskRepository } from '../repositories/Task.repository';
 import { TaskService } from '../services/Task.service';
+import { UserRepository } from '../repositories/User.repository';
+import { RabbitMQService } from '../services/rbq/Rabbit.service';
 
-const repository = new TaskRepository();
-const service = new TaskService(repository);
+const taskRepository = new TaskRepository();
+const userRepository = new UserRepository();
+const rabbitMQService = new RabbitMQService();
+const service = new TaskService(taskRepository, userRepository, rabbitMQService);
 const controller = new TaskController(service);
 
 const router = Router();

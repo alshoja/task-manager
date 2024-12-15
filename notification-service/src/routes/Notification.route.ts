@@ -4,10 +4,12 @@ import { CreateNotificationDTO } from '../dto/Notification.dto';
 import { validateDto } from '../middlewares/Validation.middleware';
 import { NotificationRepository } from '../repositories/Notification.repository';
 import { NotificationService } from '../services/Notification.service';
+import { RabbitMQService } from '../services/rbq/Rabbit.service';
 
 
 const repository = new NotificationRepository();
-const service = new NotificationService(repository);
+const rabbitMQService = new RabbitMQService();
+const service = new NotificationService(repository, rabbitMQService);
 const controller = new NotificationController(service);
 
 const router = Router();

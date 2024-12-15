@@ -4,8 +4,15 @@ import { AppError, globalErrorMiddleware } from "./middlewares/GlobalErrorHandle
 import Routes from "./routes/Index";
 import { redis } from "./config/Redis.config";
 import { rabbitMQ } from "./config/Rabbitmq.config";
+import { NotificationService } from "./services/Notification.service";
+import { NotificationRepository } from "./repositories/Notification.repository";
+import { RabbitMQService } from "./services/rbq/Rabbit.service";
 
 dotenv.config();
+const repository = new NotificationRepository();
+const rabbitMQService = new RabbitMQService();
+const notificationService = new NotificationService(repository, rabbitMQService);
+
 export class App {
   public app: Application;
 
@@ -15,6 +22,7 @@ export class App {
     this.initializeRoutes();
     this.initializeErrorHandling();
     this.initializeExternalServices();
+    notificationService.listenForNotifications()
   }
 
   private initializeMiddlewares(): void {

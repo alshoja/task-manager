@@ -5,7 +5,7 @@ export class Notifications1734215323491 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: "tasks",
+                name: "notifications",
                 columns: [
                     {
                         name: "id",
@@ -48,7 +48,7 @@ export class Notifications1734215323491 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable("tasks");
+        await queryRunner.dropTable("notifications");
     }
 
 }

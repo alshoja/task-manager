@@ -10,13 +10,17 @@ export class UserRepository {
     this.repository = AppDataSource.getRepository(User);
   }
 
-  async create(user:CreateUserDTO): Promise<User> {
+  async create(user: CreateUserDTO): Promise<User> {
     const _user = this.repository.create(user);
     return await this.repository.save(_user);
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
     return this.repository.findOne({ where: { email } });
+  }
+
+  async findUserById(id: number): Promise<User | null> {
+    return this.repository.findOneBy({ id });
   }
 
   async updateUser(id: number, username: string, email: string, isActive: boolean): Promise<User | null> {
