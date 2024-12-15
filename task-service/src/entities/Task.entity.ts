@@ -21,11 +21,14 @@ export class Task {
 
   @ManyToMany(() => Tag, (tag) => tag.tasks, { cascade: true, eager: true })
   @JoinTable({
-    name: 'task_tags', 
+    name: 'task_tags',
     joinColumn: { name: 'task_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' }
   })
   tags!: Tag[];
+
+  @Column({ nullable: false })
+  user_id!: number; 
 
   @CreateDateColumn()
   created_at?: Date;

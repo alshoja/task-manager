@@ -6,14 +6,10 @@ services:
       context: ./notification-service
     container_name: notification_service
     restart: unless-stopped
+    env_file:
+      - ./notification-service/.env
     environment:
-      - NODE_ENV=development
-      - RABBITMQ_URL=amqp://rabbit_mq:5672
-      - REDIS_URL=redis://redis:6379
       - DB_HOST=task_manager_db
-      - DB_USER=root
-      - DB_PASSWORD=alshoja
-      - DB_NAME=notification_service
     depends_on:
       - rabbitmq
       - redis
@@ -32,14 +28,10 @@ services:
       context: ./task-service
     container_name: task_service
     restart: unless-stopped
+    env_file:
+      - ./task-service/.env
     environment:
-      - NODE_ENV=development
-      - RABBITMQ_URL=amqp://rabbit_mq:5672
-      - REDIS_URL=redis://redis:6379
       - DB_HOST=task_manager_db
-      - DB_USER=root
-      - DB_PASSWORD=alshoja
-      - DB_NAME=task_service
     depends_on:
       - rabbitmq
       - redis

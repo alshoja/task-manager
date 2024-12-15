@@ -1,9 +1,9 @@
 import express from "express";
 import { AuthMiddleware } from "../middlewares/Auth.middleware";
-import taskRoutes from "./Task.route";
+import notificationRoutes from "./Notification.route";
 
 const router = express.Router();
 
-router.use("/api", AuthMiddleware.verifyJwt, taskRoutes);
+router.use("/api", AuthMiddleware.verifyJwt, notificationRoutes);
 
 export default router;
