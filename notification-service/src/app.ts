@@ -1,20 +1,18 @@
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from '@apollo/server/express4';
+import bodyParser from "body-parser";
+import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application } from "express";
 import { rabbitMQ } from "./config/Rabbitmq.config";
 import { redis } from "./config/Redis.config";
+import { resolvers } from "./graphql/resolver";
+import { typeDefs } from "./graphql/schema";
 import { AppError, globalErrorMiddleware } from "./middlewares/GlobalErrorHandler.middleware";
 import { NotificationRepository } from "./repositories/Notification.repository";
 import Routes from "./routes/Index";
 import { NotificationService } from "./services/Notification.service";
 import { RabbitMQService } from "./services/rbq/Rabbit.service";
-import http from 'http';
-import { expressMiddleware } from '@apollo/server/express4';
-import { typeDefs } from "./graphql/schema";
-import { notificationResolvers } from "./controllers/gql/notification.resolver";
-import { ApolloServer } from "@apollo/server";
-import bodyParser from "body-parser";
-import cors from "cors";
-import { resolvers } from "./graphql/resolver";
 
 dotenv.config();
 const repository = new NotificationRepository();
