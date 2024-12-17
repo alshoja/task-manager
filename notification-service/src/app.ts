@@ -6,13 +6,18 @@ import dotenv from "dotenv";
 import express, { Application } from "express";
 import { rabbitMQ } from "./config/Rabbitmq.config";
 import { redis } from "./config/Redis.config";
-import { resolvers } from "./graphql/resolver";
-import { typeDefs } from "./graphql/schema";
 import { AppError, globalErrorMiddleware } from "./middlewares/GlobalErrorHandler.middleware";
 import { NotificationRepository } from "./repositories/Notification.repository";
 import Routes from "./routes/Index";
 import { NotificationService } from "./services/Notification.service";
 import { RabbitMQService } from "./services/rbq/Rabbit.service";
+import { notificationResolvers } from "./controllers/gql/notification.resolver";
+import { notificationTypeDefs } from "./controllers/gql/notification.schema";
+import { createServer, Server as HttpServer } from "http";
+import { WebSocketServer } from "ws";
+import { useServer } from "graphql-ws/lib/use/ws";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 
 dotenv.config();
 const repository = new NotificationRepository();
@@ -21,9 +26,11 @@ const notificationService = new NotificationService(repository, rabbitMQService)
 
 export class App {
   public app: Application;
+  private httpServer: HttpServer;
 
   constructor() {
     this.app = express();
+    this.httpServer = createServer(this.app);
     this.initializeMiddlewares();
     this.initializeRoutes();
     this.initializeErrorHandling();
@@ -61,18 +68,48 @@ export class App {
   }
 
   private async initializeGraphql() {
-    const server = new ApolloServer({
-      typeDefs,
-      resolvers,
-    });
+    try {
+      const schema = makeExecutableSchema({
+        typeDefs: [notificationTypeDefs],
+        resolvers: [notificationResolvers],
+      });
 
-    await server.start();
-    this.app.use(
-      "/graphql",
-      cors<cors.CorsRequest>(),
-      bodyParser.json(),
-      expressMiddleware(server)
-    );
+      const wsServer = new WebSocketServer({
+        server: this.httpServer,
+        path: "/graphql",
+      });
+
+      const serverCleanup = useServer({ schema }, wsServer);
+      const server = new ApolloServer({
+        schema,
+        plugins: [
+          ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer }),
+          {
+            async serverWillStart() {
+              return {
+                async drainServer() {
+                  await serverCleanup.dispose();
+                },
+              };
+            },
+          },
+        ],
+
+      });
+
+      await server.start();
+      this.app.use(
+        "/graphql",
+        cors<cors.CorsRequest>(),
+        bodyParser.json(),
+        expressMiddleware(server)
+      );
+
+
+      console.log("Graphql initialization success ")
+    } catch (error) {
+      console.log("graphql initialization failed:", error)
+    }
   }
 
   public getApp(): Application {
