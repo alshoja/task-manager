@@ -15,7 +15,6 @@ export class Server {
     try {
 
       const httpServer = this.appInstance.getHttpServer();
-
       httpServer.listen(this.port, () => {
         console.log(`🚀 Server is running on http://localhost:${this.port}`);
         console.log(`🚀 Subscriptions are ready at ws://localhost:${this.port}/graphql`);

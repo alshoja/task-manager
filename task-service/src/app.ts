@@ -5,14 +5,17 @@ import Routes from "./routes/Index";
 import { redis } from "./config/Redis.config";
 import { rabbitMQ } from "./config/Rabbitmq.config";
 import authRoutes from "./routes/Auth.route";
-
+import { createServer, Server as HttpServer } from "http";
 
 dotenv.config();
 export class App {
   public app: Application;
+  private httpServer: HttpServer;
+
 
   constructor() {
     this.app = express();
+    this.httpServer = createServer(this.app);
     this.initializeMiddlewares();
     this.initializeRoutes();
     this.initializeErrorHandling();
@@ -42,7 +45,7 @@ export class App {
     }
   }
 
-  public getApp(): Application {
-    return this.app;
+  public getHttpServer(): HttpServer {
+    return this.httpServer;
   }
 }
