@@ -1,33 +1,28 @@
-import { PubSub } from "graphql-subscriptions";
+import { PubSub } from 'graphql-subscriptions';
 
-const pubsub = new PubSub();
 const NOTIFICATION_ADDED = "NOTIFICATION_ADDED";
 
 let notifications: { id: string; message: string; createdAt: string }[] = [];
 
+const pubsub = new PubSub();
+
+let currentNumber = 0;
+function incrementNumber() {
+  currentNumber++;
+  pubsub.publish('NUMBER_INCREMENTED', { numberIncremented: currentNumber });
+  setTimeout(incrementNumber, 1000);
+}
+
+incrementNumber();
 export const notificationResolvers = {
   Query: {
-    notifications: () => notifications,
-  },
-
-  Mutation: {
-    addNotification: (_: any, { message }: { message: string }) => {
-      const newNotification = {
-        id: String(notifications.length + 1),
-        message,
-        createdAt: new Date().toISOString(),
-      };
-      notifications.push(newNotification);
-
-      pubsub.publish(NOTIFICATION_ADDED, { notificationAdded: newNotification });
-
-      return newNotification;
+    currentNumber() {
+      return currentNumber;
     },
   },
-
   Subscription: {
-    notificationAdded: {
-      subscribe: () => pubsub.asyncIterableIterator(NOTIFICATION_ADDED),
+    numberIncremented: {
+      subscribe: () => pubsub.asyncIterator(['NUMBER_INCREMENTED']),
     },
   },
 };

@@ -1,6 +1,7 @@
 import { App } from "./app";
 import { rabbitMQ } from "./config/Rabbitmq.config";
 import { redis } from "./config/Redis.config";
+import WebSocket from 'ws';
 export class Server {
   private port: number;
   private appInstance: App;
@@ -13,8 +14,11 @@ export class Server {
   public async start(): Promise<void> {
     try {
 
-      this.appInstance.getApp().listen(this.port, () => {
-        console.log(`Server is running on http://localhost:${this.port}`);
+      const httpServer = this.appInstance.getHttpServer();
+
+      httpServer.listen(this.port, () => {
+        console.log(`🚀 Server is running on http://localhost:${this.port}`);
+        console.log(`🚀 Subscriptions are ready at ws://localhost:${this.port}/graphql`);
       });
 
       this.setupGracefulShutdown();

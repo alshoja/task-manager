@@ -15,9 +15,14 @@ import { notificationResolvers } from "./controllers/gql/notification.resolver";
 import { notificationTypeDefs } from "./controllers/gql/notification.schema";
 import { createServer, Server as HttpServer } from "http";
 import { WebSocketServer } from "ws";
-import { useServer } from "graphql-ws/lib/use/ws";
+import { useServer } from 'graphql-ws/lib/use/ws';
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+const {
+  ApolloServerPluginLandingPageProductionDefault,
+  ApolloServerPluginLandingPageLocalDefault
+} = require('apollo-server-core');
+import { PubSub } from 'graphql-subscriptions';
 
 dotenv.config();
 const repository = new NotificationRepository();
@@ -36,7 +41,7 @@ export class App {
     this.initializeErrorHandling();
     this.initializeExternalServices();
     this.initializeGraphql()
-    notificationService.listenForNotifications();
+    // notificationService.listenForNotifications();
 
   }
 
@@ -45,13 +50,13 @@ export class App {
   }
 
   private initializeRoutes(): void {
-    this.app.use("/", Routes);
-    this.app.all('*', (req, res, next) => {
-      if (req.originalUrl === '/graphql') {
-        return next();
-      }
-      next(new AppError(`Can't find ${req.originalUrl} on the server!`, 404));
-    });
+    // this.app.use("/", Routes);
+    // this.app.all('*', (req, res, next) => {
+    //   if (req.originalUrl === '/graphql') {
+    //     return next();
+    //   }
+    //   next(new AppError(`Can't find ${req.originalUrl} on the server!`, 404));
+    // });
   }
 
   private initializeErrorHandling(): void {
@@ -68,52 +73,46 @@ export class App {
   }
 
   private async initializeGraphql() {
-    try {
-      const schema = makeExecutableSchema({
-        typeDefs: [notificationTypeDefs],
-        resolvers: [notificationResolvers],
-      });
 
-      const wsServer = new WebSocketServer({
-        server: this.httpServer,
-        path: "/graphql",
-      });
 
-      const serverCleanup = useServer({ schema }, wsServer);
-      const server = new ApolloServer({
-        schema,
-        plugins: [
-          ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer }),
-          {
-            async serverWillStart() {
-              return {
-                async drainServer() {
-                  await serverCleanup.dispose();
-                },
-              };
-            },
+    const schema = makeExecutableSchema({ typeDefs: [notificationTypeDefs], resolvers: [notificationResolvers] });
+    const wsServer = new WebSocketServer({
+      server: this.httpServer,
+      path: '/graphql',
+    });
+    const serverCleanup = useServer({ schema }, wsServer);
+
+    const server = new ApolloServer({
+      schema,
+      plugins: [
+        ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer }),
+
+        {
+          async serverWillStart() {
+            return {
+              async drainServer() {
+                await serverCleanup.dispose();
+              },
+            };
           },
-        ],
+        },
 
-      });
+        process.env.NODE_ENV === "production"
+          ? ApolloServerPluginLandingPageProductionDefault({
+            embed: true,
+            graphRef: "plaid-gufzoj@current"
+          })
+          : ApolloServerPluginLandingPageLocalDefault({ embed: true })
+      ],
+    });
 
-      await server.start();
-      this.app.use(
-        "/graphql",
-        cors<cors.CorsRequest>(),
-        bodyParser.json(),
-        expressMiddleware(server)
-      );
+    await server.start();
+    this.app.use('/graphql', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server));
 
-
-      console.log("Graphql initialization success ")
-    } catch (error) {
-      console.log("graphql initialization failed:", error)
-    }
   }
 
-  public getApp(): Application {
-    return this.app;
+  public getHttpServer(): HttpServer {
+    return this.httpServer;
   }
 }
 
