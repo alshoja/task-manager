@@ -1,7 +1,6 @@
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import { makeExecutableSchema } from "@graphql-tools/schema";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -11,16 +10,15 @@ import { createServer, Server as HttpServer } from "http";
 import { WebSocketServer } from "ws";
 import { rabbitMQ } from "./config/Rabbitmq.config";
 import { redis } from "./config/Redis.config";
-import { notificationResolvers } from "./controllers/gql/notification.resolver";
-import { notificationTypeDefs } from "./controllers/gql/notification.schema";
 import { AppError, globalErrorMiddleware } from "./middlewares/GlobalErrorHandler.middleware";
 import Routes from "./routes/Index";
+import { schema } from "./graphql";
+import { NotificationService } from "./services/Notification.service";
 
 dotenv.config();
 export class App {
   public app: Application;
   private httpServer: HttpServer;
-
   constructor() {
     this.app = express();
     this.httpServer = createServer(this.app);
@@ -28,7 +26,8 @@ export class App {
     this.initializeRoutes();
     this.initializeErrorHandling();
     this.initializeExternalServices();
-    this.initializeGraphql()
+    this.initializeGraphql();
+    this.initializeRedisPubSub();
   }
 
   private initializeMiddlewares(): void {
@@ -64,7 +63,6 @@ export class App {
       ApolloServerPluginLandingPageLocalDefault
     } = require('apollo-server-core');
 
-    const schema = makeExecutableSchema({ typeDefs: [notificationTypeDefs], resolvers: [notificationResolvers] });
     const wsServer = new WebSocketServer({
       server: this.httpServer,
       path: '/graphql',
@@ -97,6 +95,14 @@ export class App {
 
     await server.start();
     this.app.use('/graphql', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server));
+  }
+
+  async initializeRedisPubSub() {
+    redis.createPubSub().then((pubSub) =>
+      console.log('🚀 Redis PubSub initialized')
+    ).catch((err) =>
+      console.error('Error initializing Redis PubSub:', err)
+    );
   }
 
   public getHttpServer(): HttpServer {

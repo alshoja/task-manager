@@ -10,7 +10,7 @@ class RabbitMQConfig {
     try {
       if (!this.connection) {
         this.connection = await amqp.connect(this.rabbitMqUrl);
-        console.log("RabbitMQ connection established");
+        console.log("🚀 RabbitMQ connection established");
         this.connection.on("error", (err) =>
           console.error("RabbitMQ connection error:", err)
         );
@@ -20,7 +20,7 @@ class RabbitMQConfig {
       }
       if (!this.channel) {
         this.channel = await this.connection.createChannel();
-        console.log("RabbitMQ channel created");
+        console.log("🚀 RabbitMQ channel created");
       }
       return this.channel;
     } catch (error) {

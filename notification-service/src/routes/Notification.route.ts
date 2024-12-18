@@ -5,15 +5,15 @@ import { validateDto } from '../middlewares/Validation.middleware';
 import { NotificationRepository } from '../repositories/Notification.repository';
 import { NotificationService } from '../services/Notification.service';
 import { RabbitMQService } from '../services/rbq/Rabbit.service';
-
+import { RedisPubSubService } from '../services/redis/RedisPubsub.service';
 
 const repository = new NotificationRepository();
 const rabbitMQService = new RabbitMQService();
-const service = new NotificationService(repository, rabbitMQService);
+const redisPubSubService = new RedisPubSubService();
+const service = new NotificationService(repository, rabbitMQService, redisPubSubService);
 const controller = new NotificationController(service);
 
 const router = Router();
-
 router.post('/notifications', validateDto(CreateNotificationDTO), controller.createNotification.bind(controller));
 router.get('/notifications', controller.getAllNotifications.bind(controller));
 router.get('/notifications/:id', controller.getNotificationById.bind(controller));

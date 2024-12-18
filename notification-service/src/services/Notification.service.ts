@@ -3,14 +3,15 @@ import { AppError } from "../middlewares/GlobalErrorHandler.middleware";
 import { NotificationRepository } from "../repositories/Notification.repository";
 import { Notification } from "../entities/Notification.entity";
 import { RabbitMQService } from "./rbq/Rabbit.service";
-
+import { RedisPubSubService } from "./redis/RedisPubsub.service";
+import { _pubSub } from "../utils/pubsub";
 export class NotificationService {
-  private notificationRepository: NotificationRepository
-  private rabbitMQService: RabbitMQService;
-
-  constructor(notificationRepository: NotificationRepository, rabbitMQService: RabbitMQService) {
-    this.rabbitMQService = rabbitMQService;
-    this.notificationRepository = notificationRepository
+  constructor(
+    private readonly notificationRepository: NotificationRepository,
+    private readonly rabbitMQService: RabbitMQService,
+    readonly redisPubSubService: RedisPubSubService
+  ) {
+    this.redisPubSubService = redisPubSubService;
   }
   async listenForNotifications(): Promise<void> {
     await this.rabbitMQService.consumeFromQueue('task_created', async (msg) => {
@@ -25,7 +26,11 @@ export class NotificationService {
         });
 
         console.log('Notification processed:', notificationData);
-
+        await this.redisPubSubService.publish('notif', {
+          notificationReceived: notificationData,
+        }).then(() => {
+          console.log(`Published message to notification:${notificationData.user_id}`);
+        });
         this.rabbitMQService.acknowledgeMessage(msg);
       } catch (error) {
         console.error('Failed to process notification:', error);
