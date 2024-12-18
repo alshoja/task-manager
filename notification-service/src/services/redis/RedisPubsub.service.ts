@@ -3,6 +3,15 @@ import { redis } from '../../config/Redis.config';
 
 export class RedisPubSubService {
     private pubSub: RedisPubSub | null = null;
+    private static instance: RedisPubSubService;
+
+    public static getInstance(): RedisPubSubService {
+
+        if (!RedisPubSubService.instance) {
+            RedisPubSubService.instance = new RedisPubSubService();
+        }
+        return RedisPubSubService.instance;
+    }
 
     public async init(): Promise<void> {
         if (!this.pubSub) {

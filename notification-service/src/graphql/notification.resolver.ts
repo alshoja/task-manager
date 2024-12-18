@@ -1,21 +1,15 @@
-import { NotificationRepository } from '../repositories/Notification.repository';
-import { NotificationService } from '../services/Notification.service';
-import { RabbitMQService } from '../services/rbq/Rabbit.service';
-import { RedisPubSubService } from '../services/redis/RedisPubsub.service';
-import { _pubSub } from '../utils/pubsub';
+import { NotificationServiceFactory } from "../factories/Notification.factory";
 
 export const notificationResolvers = {
   Subscription: {
     notificationReceived: {
       subscribe: async (_: any) => {
         // const { userId } = args;
-        const repository = new NotificationRepository();
-        const rabbitMQService = new RabbitMQService();
-        const redisPubSubService = new RedisPubSubService();
-        const notificationService = new NotificationService(repository, rabbitMQService, redisPubSubService);
-        await redisPubSubService.init();
+        const notificationService = NotificationServiceFactory.create();
+
+        await notificationService.redisPubSubService.init();
         await notificationService.listenForNotifications();
-        return redisPubSubService.asyncIterator('notif')
+        return notificationService.redisPubSubService.asyncIterator('notif')
 
       },
     },

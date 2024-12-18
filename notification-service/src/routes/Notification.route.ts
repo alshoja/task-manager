@@ -1,17 +1,11 @@
 import { Router } from 'express';
 import { NotificationController } from '../controllers/Notification.controller';
 import { CreateNotificationDTO } from '../dto/Notification.dto';
+import { NotificationServiceFactory } from '../factories/Notification.factory';
 import { validateDto } from '../middlewares/Validation.middleware';
-import { NotificationRepository } from '../repositories/Notification.repository';
-import { NotificationService } from '../services/Notification.service';
-import { RabbitMQService } from '../services/rbq/Rabbit.service';
-import { RedisPubSubService } from '../services/redis/RedisPubsub.service';
 
-const repository = new NotificationRepository();
-const rabbitMQService = new RabbitMQService();
-const redisPubSubService = new RedisPubSubService();
-const service = new NotificationService(repository, rabbitMQService, redisPubSubService);
-const controller = new NotificationController(service);
+const notificationService = NotificationServiceFactory.create();
+const controller = new NotificationController(notificationService);
 
 const router = Router();
 router.post('/notifications', validateDto(CreateNotificationDTO), controller.createNotification.bind(controller));

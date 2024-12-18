@@ -4,7 +4,6 @@ import { NotificationRepository } from "../repositories/Notification.repository"
 import { Notification } from "../entities/Notification.entity";
 import { RabbitMQService } from "./rbq/Rabbit.service";
 import { RedisPubSubService } from "./redis/RedisPubsub.service";
-import { _pubSub } from "../utils/pubsub";
 export class NotificationService {
   constructor(
     private readonly notificationRepository: NotificationRepository,

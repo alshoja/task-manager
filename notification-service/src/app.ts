@@ -10,10 +10,10 @@ import { createServer, Server as HttpServer } from "http";
 import { WebSocketServer } from "ws";
 import { rabbitMQ } from "./config/Rabbitmq.config";
 import { redis } from "./config/Redis.config";
+import { schema } from "./graphql";
 import { AppError, globalErrorMiddleware } from "./middlewares/GlobalErrorHandler.middleware";
 import Routes from "./routes/Index";
-import { schema } from "./graphql";
-import { NotificationService } from "./services/Notification.service";
+import { RedisPubSubService } from "./services/redis/RedisPubsub.service";
 
 dotenv.config();
 export class App {
@@ -27,7 +27,6 @@ export class App {
     this.initializeErrorHandling();
     this.initializeExternalServices();
     this.initializeGraphql();
-    this.initializeRedisPubSub();
   }
 
   private initializeMiddlewares(): void {
@@ -94,15 +93,15 @@ export class App {
     });
 
     await server.start();
-    this.app.use('/graphql', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server));
-  }
-
-  async initializeRedisPubSub() {
-    redis.createPubSub().then((pubSub) =>
-      console.log('🚀 Redis PubSub initialized')
-    ).catch((err) =>
-      console.error('Error initializing Redis PubSub:', err)
-    );
+    this.app.use('/graphql', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server, {
+      context: async ({ req }) => {
+        const redisPubSubService = RedisPubSubService.getInstance();
+        await redisPubSubService.init(); 
+        return {
+          redisPubSubService, 
+        };
+      },
+    }));
   }
 
   public getHttpServer(): HttpServer {
